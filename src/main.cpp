@@ -1,5 +1,6 @@
 #include "BPSParser.hpp"
 #include <array>
+#include <filesystem>
 #include <iostream>
 #include <nfd.hpp>
 
@@ -20,7 +21,9 @@ int main()
 
 	try
 	{
-		drfr::applyPatch(outPath, "data.bps");
+		std::string patchedFile = drfr::applyPatch(outPath, "data.bps");
+		std::filesystem::rename(outPath, std::string(outPath) + ".original");
+		std::filesystem::rename(patchedFile, outPath);
 	}
 	catch (const std::exception& e)
 	{

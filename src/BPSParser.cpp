@@ -3,9 +3,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
-#include <string>
 
 // Doc https://github.com/blakesmith/rombp/blob/master/docs/bps_spec.md
 
@@ -91,7 +89,7 @@ namespace drfr
 		}
 	}
 
-	void applyPatch(const nfdchar_t* sourcePath, const char* patchPath)
+	std::string applyPatch(const nfdchar_t* sourcePath, const char* patchPath)
 	{
 		static constexpr std::array<void (*)(std::ifstream&, std::fstream&, std::ifstream&, uint64_t, int&, int&, int&),
 									4>
@@ -141,5 +139,7 @@ namespace drfr
 			throw std::runtime_error("Failed to read patch file");
 		if (!target.good())
 			throw std::runtime_error("Failed to write target file");
+		return targetPath;
 	}
+
 }

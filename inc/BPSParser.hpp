@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nfd.hpp>
+#include <string>
 
 namespace drfr
 {
@@ -21,5 +22,5 @@ namespace drfr
 		uint64_t length;
 	};
 
-	void applyPatch(const nfdchar_t* file, const char* patch);
+	std::string applyPatch(const nfdchar_t* file, const char* patch);
 }
