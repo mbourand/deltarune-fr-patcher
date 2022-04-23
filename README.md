@@ -1,4 +1,4 @@
-# Deltarune FR Patcher (WIP)
+# Deltarune FR Patcher
 
 ## Installation
 ```
