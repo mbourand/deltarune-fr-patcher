@@ -1,12 +1,20 @@
 #include "BPSParser.hpp"
 #include <array>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <nfd.hpp>
 
 int main()
 {
 	NFD_Init();
+
+	std::ifstream conf("files.conf", std::ios::binary);
+	if (!conf.is_open())
+	{
+		std::cout << "Error: Could not open files.conf" << std::endl;
+		return 1;
+	}
 
 	nfdchar_t* outPath = nullptr;
 	std::array<nfdfilteritem_t, 1> filters = {{{"DELTARUNE Data", "win"}}};
@@ -25,16 +33,29 @@ int main()
 		std::filesystem::rename(outPath, std::string(outPath) + ".original");
 		std::filesystem::rename(patchedFile, outPath);
 
-		std::vector<std::string> folders = {"lang", "mus"};
+		std::vector<std::string> config;
+		std::string line;
+		while (std::getline(conf, line))
+			config.push_back(line);
 		auto basePath = std::filesystem::path(outPath).parent_path();
 
-		for (const auto& folder : folders)
+		// Used to avoid throw if the original file doesn't exist.
+		std::error_code ec;
+		for (const auto& item : config)
 		{
-			for (auto& file : std::filesystem::directory_iterator(folder))
+			if (std::filesystem::is_directory(item))
 			{
-				std::filesystem::rename(basePath / folder / file.path().filename(),
-										(basePath / folder / file.path().filename()).string() + ".original");
-				std::filesystem::copy(file.path(), basePath / folder / file.path().filename());
+				for (auto& file : std::filesystem::directory_iterator(item))
+				{
+					std::filesystem::rename(basePath / item / file.path().filename(),
+											(basePath / item / file.path().filename()).string() + ".original", ec);
+					std::filesystem::copy(file.path(), basePath / item / file.path().filename());
+				}
+			}
+			else if (std::filesystem::is_regular_file(item))
+			{
+				std::filesystem::rename(basePath / item, (basePath / item).string() + ".original", ec);
+				std::filesystem::copy(item, basePath / item);
 			}
 		}
 	}
