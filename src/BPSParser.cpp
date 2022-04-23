@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <stdexcept>
 
 // Doc https://github.com/blakesmith/rombp/blob/master/docs/bps_spec.md
@@ -126,11 +128,23 @@ namespace drfr
 		int sourceRelOffsest = 0;
 		int targetRelOffsest = 0;
 
+		int printProgressrequency = 10000;
+		int current = 0;
+
+		auto startOffset = patch.tellg();
+
 		while (source.good() && patch.good() && target.good() && patch.tellg() < actionEnd)
 		{
 			Action action = decode_action(patch);
 			actionFuncs[action.type](source, target, patch, action.length, writtenToTarget, sourceRelOffsest,
 									 targetRelOffsest);
+			if (patch.tellg() / printProgressrequency > current)
+			{
+				std::cout << "Progress: " << std::setprecision(2) << std::fixed
+						  << ((patch.tellg() - startOffset) * 100) / static_cast<float>(actionEnd - startOffset) << "%"
+						  << std::endl;
+				current++;
+			}
 		}
 
 		if (!source.good())
