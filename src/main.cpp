@@ -21,9 +21,9 @@ int main()
 
 	try
 	{
-		/*std::string patchedFile = drfr::applyPatch(outPath, "data.bps");
+		std::string patchedFile = drfr::applyPatch(outPath, "data.bps");
 		std::filesystem::rename(outPath, std::string(outPath) + ".original");
-		std::filesystem::rename(patchedFile, outPath);*/
+		std::filesystem::rename(patchedFile, outPath);
 
 		std::vector<std::string> folders = {"lang", "mus"};
 		auto basePath = std::filesystem::path(outPath).parent_path();
