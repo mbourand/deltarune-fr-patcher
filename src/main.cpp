@@ -9,6 +9,15 @@ int main()
 {
 	NFD_Init();
 
+	std::cout << "  _____  ______ _   _______       _____  _    _ _   _ ______   ______ _____  \n |  __ \\|  ____| | "
+				 "|__   __|/\\   |  __ \\| |  | | \\ | |  ____| |  ____|  __ \\ \n | |  | | |__  | |    | |  /  \\  | "
+				 "|__) | |  | |  \\| | |__    | |__  | |__) |\n | |  | |  __| | |    | | / /\\ \\ |  _  /| |  | | . ` "
+				 "|  __|   |  __| |  _  / \n | |__| | |____| |____| |/ ____ \\| | \\ \\| |__| | |\\  | |____  | |    | "
+				 "| \\ \\ \n |_____/|______|______|_/_/    \\_\\_|  \\_\\\\____/|_| \\_|______| |_|    |_|  \\_\\\n    "
+				 "                                                                                                     "
+				 "                                                 "
+			  << std::endl;
+
 	std::ifstream conf("files.conf", std::ios::binary);
 	if (!conf.is_open())
 	{
@@ -16,6 +25,7 @@ int main()
 		return 1;
 	}
 
+	std::cout << "Please select your game's data.win" << std::endl;
 	nfdchar_t* outPath = nullptr;
 	std::array<nfdfilteritem_t, 1> filters = {{{"DELTARUNE Data", "win"}}};
 	nfdresult_t result = NFD_OpenDialog(&outPath, filters.data(), filters.size(), nullptr);
@@ -23,7 +33,7 @@ int main()
 		return 0;
 	else if (result == NFD_ERROR)
 	{
-		std::cout << "Error: " << NFD_GetError() << std::endl;
+		std::cerr << "Error: " << NFD_GetError() << std::endl;
 		NFD_Quit();
 		return 1;
 	}
@@ -64,11 +74,16 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "Error: " << e.what() << std::endl;
+		std::cerr << "Error: " << e.what() << std::endl;
+		std::cout << "Press enter to exit..." << std::endl;
+		std::cin.get();
 		NFD_FreePath(outPath);
 		NFD_Quit();
 		return 1;
 	}
+
+	std::cout << "Press enter to exit..." << std::endl;
+	std::cin.get();
 
 	NFD_Quit();
 	return 0;
