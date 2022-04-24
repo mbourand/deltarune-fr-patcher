@@ -24,6 +24,7 @@ int main()
 	else if (result == NFD_ERROR)
 	{
 		std::cout << "Error: " << NFD_GetError() << std::endl;
+		NFD_Quit();
 		return 1;
 	}
 
@@ -58,12 +59,17 @@ int main()
 				std::filesystem::copy(item, basePath / item);
 			}
 		}
+
+		NFD_FreePath(outPath);
 	}
 	catch (const std::exception& e)
 	{
 		std::cout << "Error: " << e.what() << std::endl;
+		NFD_FreePath(outPath);
+		NFD_Quit();
 		return 1;
 	}
 
 	NFD_Quit();
+	return 0;
 }

@@ -1,4 +1,5 @@
 #include "BPSParser.hpp"
+#include "CRC32.hpp"
 #include <array>
 #include <cstdlib>
 #include <filesystem>
@@ -11,6 +12,7 @@
 
 namespace drfr
 {
+
 	static uint64_t decode_number(std::ifstream& file)
 	{
 		uint64_t data = 0, shift = 1;
@@ -28,15 +30,15 @@ namespace drfr
 		return data;
 	}
 
-	Action decode_action(std::ifstream& file)
+	static Action decode_action(std::ifstream& file)
 	{
 		uint64_t raw = decode_number(file);
 		return {static_cast<uint8_t>(raw & 0b11), (raw >> 2) + 1};
 	}
 
 	// Copies data from source to target.
-	void readSource(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
-					int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
+	static void readSource(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
+						   int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
 	{
 		source.seekg(writtenToTarget, std::ios::beg);
 		target.seekg(writtenToTarget, std::ios::beg);
@@ -47,8 +49,8 @@ namespace drfr
 	}
 
 	// Copies data from patch to target.
-	void readTarget(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
-					int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
+	static void readTarget(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
+						   int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
 	{
 		target.seekg(writtenToTarget, std::ios::beg);
 		std::vector<uint8_t> buffer(length);
@@ -58,8 +60,8 @@ namespace drfr
 	}
 
 	// Copies data from source to target with an offset applied to source.
-	void copySource(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
-					int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
+	static void copySource(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
+						   int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
 	{
 		uint64_t data = decode_number(patch);
 		sourceRelOffset += (data & 1 ? -1 : 1) * (data >> 1);
@@ -75,8 +77,8 @@ namespace drfr
 	// Copies data from target to target with an offset applied to target.
 	// Used for optimisation of repeated data
 	// Not really optimizable, because we dont assume that every byte copied is already written in target.
-	void copyTarget(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
-					int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
+	static void copyTarget(std::ifstream& source, std::fstream& target, std::ifstream& patch, uint64_t length,
+						   int& writtenToTarget, int& sourceRelOffset, int& targetRelOffset)
 	{
 		uint64_t data = decode_number(patch);
 		targetRelOffset += (data & 1 ? -1 : 1) * (data >> 1);
@@ -100,19 +102,30 @@ namespace drfr
 		std::ifstream source(sourcePath, std::ios::binary);
 		std::ifstream patch(patchPath, std::ios::binary);
 
+		if (!source.is_open() || !patch.is_open())
+			throw std::runtime_error("Failed to open file");
+
+		uint64_t end = patch.seekg(0, std::ios::end).tellg();
+		auto actionEnd = patch.seekg(end - FOOTER_SIZE, std::ios::beg).tellg();
+
+		std::array<uint32_t, 3> crcs;
+		patch.read(reinterpret_cast<char*>(crcs.data()), FOOTER_SIZE / crcs.size());
+
+		patch.seekg(0, std::ios::beg);
+
+		std::cout << "Verifying source file..." << std::endl;
+		if (crcs[0] != crc32(source))
+			throw std::runtime_error("Invalid source file: CRC32 doesn't match");
+		std::cout << "Verifying source file... OK" << std::endl;
+
 		std::string targetPath = std::string(sourcePath) + ".tmp";
 		{
 			std::ofstream target(targetPath);
 		}
 
 		std::fstream target(targetPath, std::ios::binary | std::ios::out | std::ios::in | std::ios::trunc);
-
-		if (!source.is_open() || !patch.is_open())
+		if (!target.is_open())
 			throw std::runtime_error("Failed to open file");
-
-		uint64_t end = patch.seekg(0, std::ios::end).tellg();
-		auto actionEnd = patch.seekg(end - FOOTER_SIZE, std::ios::beg).tellg();
-		patch.seekg(0, std::ios::beg);
 
 		for (int i = 0; i < BPS_MAGIC_LENGTH; i++)
 			if (patch.get() != BPS_MAGIC[i])
@@ -133,6 +146,7 @@ namespace drfr
 
 		auto startOffset = patch.tellg();
 
+		std::cout << "Applying patch..." << std::endl;
 		while (source.good() && patch.good() && target.good() && patch.tellg() < actionEnd)
 		{
 			Action action = decode_action(patch);
@@ -153,6 +167,7 @@ namespace drfr
 			throw std::runtime_error("Failed to read patch file");
 		if (!target.good())
 			throw std::runtime_error("Failed to write target file");
+		std::cout << "Patch applied successfully" << std::endl;
 		return targetPath;
 	}
 

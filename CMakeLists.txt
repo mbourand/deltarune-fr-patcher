@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Sources
 
 
-add_executable(${PROJECT_NAME} src/main.cpp src/BPSParser.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/BPSParser.cpp src/CRC32.cpp)
 
 # Building Libs
 
