@@ -7,8 +7,18 @@
 
 namespace drfr
 {
-	struct UpdaterWindow
+	class UpdaterWindow
 	{
+	public:
+		enum State
+		{
+			Idle,
+			Downloading,
+			DoneDownloading,
+			Installing,
+			DoneInstalling,
+		};
+
 		sf::RenderWindow window;
 		sf::Event event;
 		sf::Texture backgroundImg, logoImg;
@@ -22,6 +32,13 @@ namespace drfr
 		sf::Image icon;
 		std::string latestVersion;
 
+		State state;
+		uint64_t totalDownloadSize;
+		std::vector<std::string> filesToDownload;
+		uint64_t downloadTime;
+		std::string dataWinPathStr;
+		float installProgress;
+
 		void init();
 
 		void handleEvents();
@@ -33,5 +50,12 @@ namespace drfr
 		bool isInstalled() const;
 		std::string getVersion() const;
 		bool isUpToDate() const;
+
+	private:
+		void _download();
+		void _updateDownloadProgress();
+		void _applyPatch();
+		void _updateInstallProgressBar();
+		void _moveFiles();
 	};
 }

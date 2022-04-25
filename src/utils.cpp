@@ -56,22 +56,20 @@ namespace utils
 		std::fstream fs(dest, std::fstream::out | std::fstream::binary);
 
 		curl = curl_easy_init();
-		if (curl)
-		{
-			curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &write_data_in_file);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fs);
-			curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+		if (!curl)
+			return -1;
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &write_data_in_file);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fs);
+		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-			res = curl_easy_perform(curl);
-			if (res != CURLE_OK)
-				return res;
-			curl_easy_cleanup(curl);
-			fs.close();
+		res = curl_easy_perform(curl);
+		if (res != CURLE_OK)
 			return res;
-		}
-		return -1;
+		curl_easy_cleanup(curl);
+		fs.close();
+		return res;
 	}
 
 	std::vector<std::string> split(std::string str, const std::string& delimiter)
@@ -112,5 +110,16 @@ namespace utils
 		std::string ret = outPath;
 		NFD_FreePath(outPath);
 		return ret;
+	}
+
+	void openWebPage(const std::string& url)
+	{
+#if defined(OS_WINDOWS)
+		system((std::string("start") + url).c_str());
+#elif defined(OS_MACOS)
+		system((std::string("open '") + url + "'").c_str());
+#elif defined(OS_LINUX)
+		system((std::string("xdg-open '") + url + "'").c_str());
+#endif
 	}
 }

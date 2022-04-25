@@ -93,7 +93,7 @@ namespace drfr
 		}
 	}
 
-	std::string applyPatch(const std::string& sourcePath, const std::string& patchPath, const std::string& targetPath)
+	void applyPatch(std::string sourcePath, std::string patchPath, std::string targetPath, float& progress)
 	{
 		static constexpr std::array<void (*)(std::ifstream&, std::fstream&, std::ifstream&, uint64_t, int&, int&, int&),
 									4>
@@ -113,10 +113,8 @@ namespace drfr
 
 		patch.seekg(0, std::ios::beg);
 
-		std::cout << "Verifying source file..." << std::endl;
 		if (crcs[0] != crc32(source))
 			throw std::runtime_error("Invalid source file: CRC32 doesn't match");
-		std::cout << "Verifying source file... OK" << std::endl;
 
 		{
 			std::ofstream target(targetPath);
@@ -140,24 +138,14 @@ namespace drfr
 		int sourceRelOffsest = 0;
 		int targetRelOffsest = 0;
 
-		int printProgressrequency = 10000;
-		int current = 0;
-
 		auto startOffset = patch.tellg();
 
-		std::cout << "Applying patch..." << std::endl;
 		while (source.good() && patch.good() && target.good() && patch.tellg() < actionEnd)
 		{
 			Action action = decode_action(patch);
 			actionFuncs[action.type](source, target, patch, action.length, writtenToTarget, sourceRelOffsest,
 									 targetRelOffsest);
-			if (patch.tellg() / printProgressrequency > current)
-			{
-				std::cout << "Progress: " << std::setprecision(2) << std::fixed
-						  << ((patch.tellg() - startOffset) * 100) / static_cast<float>(actionEnd - startOffset) << "%"
-						  << std::endl;
-				current++;
-			}
+			progress = patch.tellg() / static_cast<float>(end);
 		}
 
 		if (!source.good())
@@ -166,8 +154,8 @@ namespace drfr
 			throw std::runtime_error("Failed to read patch file");
 		if (!target.good())
 			throw std::runtime_error("Failed to write target file");
-		std::cout << "Patch applied successfully" << std::endl;
-		return targetPath;
+
+		progress = 1;
 	}
 
 }

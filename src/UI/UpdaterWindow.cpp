@@ -5,18 +5,6 @@
 
 namespace drfr
 {
-	static void downloadFiles(std::string urlbase, const std::vector<std::string>& files, bool& done, uint64_t time)
-	{
-		auto temp = std::filesystem::temp_directory_path();
-		std::filesystem::create_directories(temp / std::to_string(time));
-		for (auto& file : files)
-		{
-			auto to = temp / std::to_string(time) / file;
-			utils::getToFile(urlbase + file, to.string());
-		}
-		done = true;
-	}
-
 	sf::View UpdaterWindow::getLetterboxView()
 	{
 		sf::View view = window.getView();
@@ -202,132 +190,18 @@ namespace drfr
 		progressBar.setSize(sf::Vector2f(window.getView().getSize().x * 0.45, window.getView().getSize().y * 0.02));
 
 		if (installButton.isPressed() && !isUpToDate())
-		{
-			std::string dataWinPathStr =
-				utils::openFileDialog("Sélectionnez le data.win de DELTARUNE", {{"DELTARUNE data", "win"}});
-			if (dataWinPathStr.empty())
-				return;
-			auto deltaruneFolder = std::filesystem::path(dataWinPathStr).parent_path();
-
-			std::string os = utils::getOS();
-			std::string filesRaw;
-			utils::getToString("https://deltaruneapi.mbourand.fr/updater/" + os + "_list.txt", filesRaw);
-
-			std::ofstream file("files.txt");
-			file << filesRaw;
-			file.close();
-
-			std::vector<std::string> files = utils::split(filesRaw, "\n");
-			auto totalSize = atoll(files.back().c_str());
-			files.pop_back();
-
-			bool done = false;
-			uint64_t time = std::time(nullptr);
-			std::thread dlThread(downloadFiles, std::string("https://deltaruneapi.mbourand.fr/updater/" + os + "/"),
-								 std::ref(files), std::ref(done), time);
-			dlThread.detach();
-
-			progressBar.setProgression(0);
-			progressBar.setMax(totalSize);
-			progressBar.setEnabled(true);
-			installButton.setEnabled(false);
-			uninstallButton.setEnabled(false);
-
-			auto temp = std::filesystem::temp_directory_path();
-			sf::Clock clock;
-			while (!done)
-			{
-				uint64_t downloaded = 0;
-				for (auto& file : files)
-				{
-					std::ifstream in(temp / std::to_string(time) / file, std::ifstream::ate | std::ifstream::binary);
-					if (!in.is_open())
-						continue;
-					downloaded += in.tellg();
-				}
-				progressBar.setProgression(downloaded);
-				std::wstring downloadedStr = std::to_wstring((downloaded / 10000) / 100.0);
-				std::wstring toDownloadStr = std::to_wstring((totalSize / 10000) / 100.0);
-				downloadedStr.erase(downloadedStr.find('.') + 3, std::string::npos);
-				toDownloadStr.erase(toDownloadStr.find('.') + 3, std::string::npos);
-				progressBar.setDesc(std::wstring(L"Téléchargé : ") + downloadedStr + L" / " + toDownloadStr + L"Mo");
-				this->handleEvents();
-				if (clock.getElapsedTime().asSeconds() > (1 / static_cast<float>(FRAMERATE)))
-				{
-					this->doTick();
-					clock.restart();
-				}
-				this->render();
-			}
-
-			for (auto& file : files)
-			{
-				if (std::filesystem::path(file).extension() == ".bps")
-				{
-					std::string targetPath =
-						(temp / std::to_string(time) / std::filesystem::path(dataWinPathStr).filename()).string();
-					drfr::applyPatch(dataWinPathStr, (temp / std::to_string(time) / file).string(), targetPath);
-					file = "data.win";
-				}
-			}
-
-			std::error_code ec; // To avoid throws
-			if (!isInstalled())
-				for (auto& file : files)
-					std::filesystem::rename(deltaruneFolder / file, deltaruneFolder / (file + ".original"), ec);
-
-			for (auto& file : files)
-			{
-				std::filesystem::remove(deltaruneFolder / file, ec);
-				auto fileFolder = (deltaruneFolder / file).parent_path();
-				std::filesystem::create_directories(fileFolder);
-				std::filesystem::rename(temp / std::to_string(time) / file, deltaruneFolder / file);
-			}
-
-			std::string version;
-			utils::getToString("https://deltaruneapi.mbourand.fr/updater/version.txt", version);
-			std::ofstream out("version.txt");
-			out << version;
-			out.close();
-
-			installButton.setText(L"Jeu déjà à jour");
-			installButton.setEnabled(false);
-			uninstallButton.setEnabled(true);
-			progressBar.setEnabled(false);
-		}
-
-		if (uninstallButton.isPressed() && isInstalled())
-		{
-			std::ifstream file("files.txt");
-			std::string filesRaw((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			file.close();
-
-			auto files = utils::split(filesRaw, "\n");
-			for (auto& file : files)
-			{
-				std::string filePath = "./" + file;
-				remove(filePath.c_str());
-				rename(std::string(filePath + ".original").c_str(), filePath.c_str());
-			}
-			remove("files.txt");
-			remove("version.txt");
-
-			uninstallButton.setEnabled(false);
-			installButton.setEnabled(true);
-			installButton.setText(L"Installer");
-		}
-
+			this->_download();
 		if (creditsButton.isPressed())
-		{
-// Ouvre la fenêtre de crédits en fonction de l'OS
-#if defined(OS_WINDOWS)
-			system("start https://deltarune.fr/credits.html");
-#elif defined(OS_MACOS)
-			system("open 'https://deltarune.fr/credits.html'");
-#elif defined(OS_LINUX)
-			system("xdg-open 'https://deltarune.fr/credits.html'");
-#endif
-		}
+			utils::openWebPage("https://deltarune.fr/credits");
+
+		if (this->state == State::Downloading)
+			this->_updateDownloadProgress();
+		if (this->state == State::DoneDownloading)
+			this->_applyPatch();
+		if (this->state == State::Installing)
+			this->_updateInstallProgressBar();
+		if (this->state == State::DoneInstalling)
+			this->_moveFiles();
 	}
 
 	void UpdaterWindow::render()
