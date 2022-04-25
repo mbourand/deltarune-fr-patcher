@@ -47,8 +47,11 @@ namespace utils
 		CURL* curl;
 		CURLcode res;
 
-		auto folder = std::filesystem::path(dest.substr(0, dest.find_last_of("/")));
-		std::filesystem::create_directories(folder);
+		if (dest.find_last_of("/") != std::string::npos)
+		{
+			auto folder = std::filesystem::path(dest.substr(0, dest.find_last_of("/")));
+			std::filesystem::create_directories(folder);
+		}
 
 		std::fstream fs(dest, std::fstream::out | std::fstream::binary);
 

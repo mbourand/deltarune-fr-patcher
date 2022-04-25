@@ -85,5 +85,5 @@ namespace drfr
 
 	void Button::setEnabled(bool enabled) { this->enabled = enabled; }
 
-	void Button::setText(const std::wstring& text) { this->text = text; }
+	void Button::setText(const std::wstring& text) { this->text = sf::String::fromUtf8(text.begin(), text.end()); }
 }

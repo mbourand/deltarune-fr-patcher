@@ -93,7 +93,7 @@ namespace drfr
 		}
 	}
 
-	std::string applyPatch(const nfdchar_t* sourcePath, const char* patchPath)
+	std::string applyPatch(const std::string& sourcePath, const std::string& patchPath, const std::string& targetPath)
 	{
 		static constexpr std::array<void (*)(std::ifstream&, std::fstream&, std::ifstream&, uint64_t, int&, int&, int&),
 									4>
@@ -118,7 +118,6 @@ namespace drfr
 			throw std::runtime_error("Invalid source file: CRC32 doesn't match");
 		std::cout << "Verifying source file... OK" << std::endl;
 
-		std::string targetPath = std::string(sourcePath) + ".tmp";
 		{
 			std::ofstream target(targetPath);
 		}

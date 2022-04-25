@@ -1,4 +1,5 @@
 #include "UI/UpdaterWindow.hpp"
+#include "BPSParser.hpp"
 #include "utils.hpp"
 #include <nfd.h>
 
@@ -257,6 +258,17 @@ namespace drfr
 					clock.restart();
 				}
 				this->render();
+			}
+
+			for (auto& file : files)
+			{
+				if (std::filesystem::path(file).extension() == ".bps")
+				{
+					std::string targetPath =
+						(temp / std::to_string(time) / std::filesystem::path(dataWinPathStr).filename()).string();
+					drfr::applyPatch(dataWinPathStr, (temp / std::to_string(time) / file).string(), targetPath);
+					file = "data.win";
+				}
 			}
 
 			std::error_code ec; // To avoid throws
