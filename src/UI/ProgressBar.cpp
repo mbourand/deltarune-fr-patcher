@@ -10,18 +10,14 @@ namespace drfr
 	}
 
 	void ProgressBar::setProgression(float current) { this->current = current; }
-
 	void ProgressBar::setMax(float max) { this->max = max; }
-
 	void ProgressBar::setDesc(const std::wstring& desc) { this->desc = desc; }
-
 	void ProgressBar::setPosition(const sf::Vector2f& pos) { this->rect.setPosition(pos); }
-
 	void ProgressBar::setSize(const sf::Vector2f& size) { this->rect.setSize(size); }
-
 	void ProgressBar::setEnabled(bool enabled) { this->enabled = enabled; }
 
 	float ProgressBar::getProgression() const { return this->current; }
+	float ProgressBar::getMax() const { return this->max; }
 
 	void ProgressBar::draw(sf::RenderWindow& window)
 	{

@@ -115,7 +115,7 @@ namespace utils
 	void openWebPage(const std::string& url)
 	{
 #if defined(OS_WINDOWS)
-		system((std::string("start") + url).c_str());
+		ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #elif defined(OS_MACOS)
 		system((std::string("open '") + url + "'").c_str());
 #elif defined(OS_LINUX)

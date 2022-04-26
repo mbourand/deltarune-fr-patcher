@@ -26,6 +26,7 @@ namespace drfr
 		void setEnabled(bool enabled);
 		void draw(sf::RenderWindow& window);
 
+		float getMax() const;
 		float getProgression() const;
 	};
 }

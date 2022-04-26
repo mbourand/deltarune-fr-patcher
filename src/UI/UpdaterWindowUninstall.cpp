@@ -5,18 +5,7 @@
 
 namespace drfr
 {
-	void UpdaterWindow::_downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time)
-	{
-		auto temp = std::filesystem::temp_directory_path();
-		std::filesystem::create_directories(temp / std::to_string(time));
-		for (auto& file : files)
-		{
-			auto to = temp / std::to_string(time) / file;
-			utils::getToFile(urlbase + file, to.string());
-		}
-	}
-
-	void UpdaterWindow::_download()
+	void UpdaterWindow::_downloadUninstall()
 	{
 		this->dataWinPathStr =
 			utils::openFileDialog("Sélectionnez le data.win de DELTARUNE", {{"DELTARUNE data", "win"}});
@@ -26,7 +15,7 @@ namespace drfr
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 		std::string os = utils::getOS();
 		std::string filesRaw;
-		utils::getToString("https://deltaruneapi.mbourand.fr/updater/" + os + "_list.txt", filesRaw);
+		utils::getToString("https://deltaruneapi.mbourand.fr/updater/" + os + "_uninstall.txt", filesRaw);
 
 		this->filesToDownload = utils::split(filesRaw, "\n");
 		this->totalDownloadSize = atoll(this->filesToDownload.back().c_str());
@@ -45,10 +34,10 @@ namespace drfr
 		this->installButton.setEnabled(false);
 		this->uninstallButton.setEnabled(false);
 
-		this->state = State::Downloading;
+		this->state = State::DownloadUninstall;
 	}
 
-	void UpdaterWindow::_updateDownloadProgress()
+	void UpdaterWindow::_updateDownloadUninstallProgress()
 	{
 		auto temp = std::filesystem::temp_directory_path();
 		uint64_t downloaded = 0;
@@ -66,13 +55,16 @@ namespace drfr
 		std::wstring toDownloadStr = std::to_wstring((totalDownloadSize / 10000) / 100.0);
 		downloadedStr.erase(downloadedStr.find('.') + 3, std::string::npos);
 		toDownloadStr.erase(toDownloadStr.find('.') + 3, std::string::npos);
-		progressBar.setDesc(std::wstring(L"Téléchargé : ") + downloadedStr + L" / " + toDownloadStr + L"Mo");
+
+		auto rounded = std::to_wstring(downloaded * 100 / progressBar.getMax());
+		rounded.erase(rounded.find('.') + 3, std::string::npos);
+		progressBar.setDesc(std::wstring(L"Desinstallation (1/2) : ") + rounded + L"%");
 
 		if (downloaded >= this->totalDownloadSize)
-			this->state = State::DoneDownloading;
+			this->state = State::DoneDownloadUninstall;
 	}
 
-	void UpdaterWindow::_applyPatch()
+	void UpdaterWindow::_applyUninstaller()
 	{
 		this->installProgress = 0;
 		auto temp = std::filesystem::temp_directory_path();
@@ -93,12 +85,12 @@ namespace drfr
 
 		this->progressBar.setProgression(0);
 		this->progressBar.setMax(1);
-		this->progressBar.setDesc(L"Prépatation de l'installation...");
+		this->progressBar.setDesc(L"Prépatation de la déinstallation...");
 
-		this->state = State::Installing;
+		this->state = State::ApplyUninstall;
 	}
 
-	void UpdaterWindow::_updateInstallProgressBar()
+	void UpdaterWindow::_updateUninstallProgress()
 	{
 		if (this->installProgress < 0)
 		{
@@ -107,39 +99,36 @@ namespace drfr
 		}
 		progressBar.setProgression(this->installProgress);
 
-		std::wstring rounded = std::to_wstring(round(this->installProgress * 10000.0f) / 100.0f);
+		std::wstring rounded = std::to_wstring(this->installProgress * 100.0f);
 		rounded.erase(rounded.find('.') + 3, std::string::npos);
-		progressBar.setDesc(std::wstring(L"Installation : ") + rounded + L"%");
+		progressBar.setDesc(std::wstring(L"Désinstallation (2/2) : ") + rounded + L"%");
 
 		if (this->installProgress >= 1)
-			this->state = State::DoneInstalling;
+			this->state = State::DoneUninstall;
 	}
 
-	void UpdaterWindow::_moveFiles()
+	void UpdaterWindow::_uninstallFiles()
 	{
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 
 		std::error_code ec; // To avoid throws
-		if (!isInstalled())
-			for (auto& file : this->filesToDownload)
-				std::filesystem::rename(deltaruneFolder / file, deltaruneFolder / (file + ".original"), ec);
-
-		auto temp = std::filesystem::temp_directory_path();
-		for (auto& file : this->filesToDownload)
+		for (auto& entry : std::filesystem::recursive_directory_iterator(deltaruneFolder))
 		{
-			std::filesystem::remove(deltaruneFolder / file, ec);
-			auto fileFolder = (deltaruneFolder / file).parent_path();
-			std::filesystem::create_directories(fileFolder);
-			std::filesystem::rename(temp / std::to_string(this->downloadTime) / file, deltaruneFolder / file);
+			if (!std::filesystem::is_regular_file(entry.path()))
+				continue;
+			auto path = std::filesystem::path(entry.path().string());
+			auto extension = path.extension().string();
+			if (extension == ".original")
+			{
+				path.replace_extension("");
+				std::filesystem::remove(path, ec);
+				std::filesystem::rename(entry.path(), path);
+			}
 		}
 
-		std::string version;
-		utils::getToString("https://deltaruneapi.mbourand.fr/updater/version.txt", version);
-		std::ofstream out("version.txt");
-		out << version;
-		out.close();
+		std::filesystem::remove("version.txt");
 
-		boxer::show("Le patch a ete applique avec succes !", "Patch applique");
+		boxer::show("Le patch a ete desinstalle avec succes !", "Patch desinstsalle");
 
 		installButton.setEnabled(true);
 		uninstallButton.setEnabled(true);

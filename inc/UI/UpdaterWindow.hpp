@@ -17,6 +17,10 @@ namespace drfr
 			DoneDownloading,
 			Installing,
 			DoneInstalling,
+			DownloadUninstall,
+			DoneDownloadUninstall,
+			ApplyUninstall,
+			DoneUninstall
 		};
 
 		sf::RenderWindow window;
@@ -53,10 +57,17 @@ namespace drfr
 		bool isUpToDate() const;
 
 	private:
+		void _scaleElements();
 		void _download();
 		void _updateDownloadProgress();
 		void _applyPatch();
 		void _updateInstallProgressBar();
 		void _moveFiles();
+		void _downloadUninstall();
+		void _updateDownloadUninstallProgress();
+		void _applyUninstaller();
+		void _updateUninstallProgress();
+		void _uninstallFiles();
+		void _downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time);
 	};
 }

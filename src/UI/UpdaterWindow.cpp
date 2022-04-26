@@ -9,14 +9,9 @@ namespace drfr
 	sf::View UpdaterWindow::getLetterboxView()
 	{
 		sf::View view = window.getView();
-		int windowWidth = window.getSize().x;
-		int windowHeight = window.getSize().y;
-		float windowRatio = windowWidth / (float)windowHeight;
-		float viewRatio = view.getSize().x / (float)view.getSize().y;
-		float sizeX = 1;
-		float sizeY = 1;
-		float posX = 0;
-		float posY = 0;
+		float windowRatio = window.getSize().x / static_cast<float>(window.getSize().y);
+		float viewRatio = view.getSize().x / static_cast<float>(view.getSize().y);
+		float sizeX = 1, sizeY = 1, posX = 0, posY = 0;
 
 		bool horizontalSpacing = true;
 		if (windowRatio < viewRatio)
@@ -27,7 +22,6 @@ namespace drfr
 			sizeX = viewRatio / windowRatio;
 			posX = (1 - sizeX) / 2.f;
 		}
-
 		else
 		{
 			sizeY = windowRatio / viewRatio;
@@ -35,7 +29,6 @@ namespace drfr
 		}
 
 		view.setViewport(sf::FloatRect(sf::Vector2f(posX, posY), sf::Vector2f(sizeX, sizeY)));
-
 		return view;
 	}
 
@@ -62,18 +55,11 @@ namespace drfr
 
 		sf::Vector2f installPos(window.getSize().x / 2 - window.getSize().x * 0.25, window.getSize().y * 0.45);
 		sf::Vector2f installSize(window.getSize().x * 0.5, window.getSize().y * 0.13);
-		installButton = Button(installPos, installSize, isInstalled() ? L"Mettre à jour" : L"Installer", 50);
-		if (isUpToDate())
-		{
-			installButton.setText(L"Jeu déjà à jour");
-			installButton.setEnabled(false);
-		}
+		installButton = Button(installPos, installSize, L"Installer", 50);
 
 		sf::Vector2f uninstallPos(window.getSize().x / 2 - window.getSize().x * 0.115, window.getSize().y * 0.795);
 		sf::Vector2f uninstallSize(window.getSize().x * 0.23, window.getSize().y * 0.07);
 		uninstallButton = Button(uninstallPos, uninstallSize, L"Désinstaller", 30);
-		if (!isInstalled())
-			uninstallButton.setEnabled(false);
 
 		sf::Vector2f creditsPos(window.getSize().x / 2 - window.getSize().x * 0.15, window.getSize().y * 0.91);
 		sf::Vector2f creditsSize(window.getSize().x * 0.3, window.getSize().y * 0.07);
@@ -99,46 +85,9 @@ namespace drfr
 
 				case sf::Event::Resized:
 					window.setSize(sf::Vector2u(std::max(event.size.width, 640u), std::max(event.size.height, 480u)));
-
-					float ratio = WINDOW_WIDTH / static_cast<float>(WINDOW_HEIGHT);
-
-					unsigned int newWidth =
-						window.getSize().x < window.getSize().y ? window.getSize().x : window.getSize().y * ratio;
-					unsigned int newHeight =
-						window.getSize().x < window.getSize().y ? window.getSize().x / ratio : window.getSize().y;
-
-					sf::View view = getLetterboxView();
+					sf::View view = this->getLetterboxView();
 					window.setView(view);
-
-					sf::Vector2f installPos(window.getSize().x / 2 - window.getSize().x * 0.25,
-											window.getSize().y * 0.45);
-					sf::Vector2f installSize(window.getSize().x * 0.5, window.getSize().y * 0.13);
-
-					sf::Vector2f uninstallPos(window.getSize().x / 2 - window.getSize().x * 0.115,
-											  window.getSize().y * 0.795);
-					sf::Vector2f uninstallSize(window.getSize().x * 0.23, window.getSize().y * 0.07);
-
-					sf::Vector2f creditsPos(window.getSize().x / 2 - window.getSize().x * 0.15,
-											window.getSize().y * 0.91);
-					sf::Vector2f creditsSize(window.getSize().x * 0.3, window.getSize().y * 0.07);
-
-					installButton.setRect(installPos, installSize);
-					installButton.setFontSize(installButton.getFontSize() * (window.getView().getSize().x /
-																			 static_cast<float>(previousResolution.x)));
-					uninstallButton.setRect(uninstallPos, uninstallSize);
-					uninstallButton.setFontSize(
-						uninstallButton.getFontSize() *
-						(window.getView().getSize().x / static_cast<float>(previousResolution.x)));
-					creditsButton.setRect(creditsPos, creditsSize);
-					creditsButton.setFontSize(creditsButton.getFontSize() * (window.getView().getSize().x /
-																			 static_cast<float>(previousResolution.x)));
-
-					progressBar.setPosition(sf::Vector2f(window.getView().getSize().x / 2 - window.getSize().x * 0.225,
-														 window.getView().getSize().y * 0.595));
-					progressBar.setSize(
-						sf::Vector2f(window.getView().getSize().x * 0.45, window.getView().getSize().y * 0.02));
-
-					previousResolution = window.getView().getSize();
+					this->_scaleElements();
 					break;
 			}
 		}
@@ -151,52 +100,15 @@ namespace drfr
 		uninstallButton.update(window, mousePreessed);
 		creditsButton.update(window, mousePreessed);
 
-		float bgScale = window.getView().getSize().y / static_cast<float>(backgroundImg.getSize().y);
-		background.setScale(sf::Vector2f(bgScale, bgScale));
-		background.setPosition(sf::Vector2f(window.getView().getSize().x / 2, window.getView().getSize().y / 2));
-		background.setOrigin(
-			sf::Vector2f(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2));
+		this->_scaleElements();
 
-		float logoScale = (window.getView().getSize().x * (2 / 3.0f)) / static_cast<float>(logoImg.getSize().x);
-		logo.setScale(sf::Vector2f(logoScale, logoScale));
-		logo.setPosition(sf::Vector2f(window.getView().getSize().x / 2, window.getView().getSize().y * 0.15));
-		logo.setOrigin(sf::Vector2f(logo.getLocalBounds().width / 2, logo.getLocalBounds().height / 2));
-
-		sf::Vector2f installPos = sf::Vector2f(window.getView().getSize().x / 2 - window.getView().getSize().x * 0.25,
-											   window.getView().getSize().y * 0.45);
-		sf::Vector2f installSize =
-			sf::Vector2f(window.getView().getSize().x * 0.5, window.getView().getSize().y * 0.13);
-		sf::Vector2f uninstallPos =
-			sf::Vector2f(window.getView().getSize().x / 2 - window.getView().getSize().x * 0.115,
-						 window.getView().getSize().y * 0.795);
-		sf::Vector2f uninstallSize =
-			sf::Vector2f(window.getView().getSize().x * 0.23, window.getView().getSize().y * 0.07);
-		sf::Vector2f creditsPos = sf::Vector2f(window.getView().getSize().x / 2 - window.getView().getSize().x * 0.15,
-											   window.getView().getSize().y * 0.91);
-		sf::Vector2f creditsSize =
-			sf::Vector2f(window.getView().getSize().x * 0.3, window.getView().getSize().y * 0.07);
-
-		installButton.setRect(installPos, installSize);
-		installButton.setFontSize(installButton.getFontSize() *
-								  (window.getView().getSize().x / static_cast<float>(previousResolution.x)));
-		uninstallButton.setRect(uninstallPos, uninstallSize);
-		uninstallButton.setFontSize(uninstallButton.getFontSize() *
-									(window.getView().getSize().x / static_cast<float>(previousResolution.x)));
-		creditsButton.setRect(creditsPos, creditsSize);
-		creditsButton.setFontSize(creditsButton.getFontSize() *
-								  (window.getView().getSize().x / static_cast<float>(previousResolution.x)));
-
-		progressBar.setPosition(sf::Vector2f(window.getView().getSize().x / 2 - window.getView().getSize().x * 0.225,
-											 window.getView().getSize().y * 0.595));
-		progressBar.setSize(sf::Vector2f(window.getView().getSize().x * 0.45, window.getView().getSize().y * 0.02));
+		if (creditsButton.isPressed())
+			utils::openWebPage("https://deltarune.fr/credits");
 
 		try
 		{
-			if (installButton.isPressed() && !isUpToDate())
+			if (installButton.isPressed())
 				this->_download();
-			if (creditsButton.isPressed())
-				utils::openWebPage("https://deltarune.fr/credits");
-
 			if (this->state == State::Downloading)
 				this->_updateDownloadProgress();
 			if (this->state == State::DoneDownloading)
@@ -215,6 +127,33 @@ namespace drfr
 				 "d'aide, rendez-vous sur notre discord.")
 					.c_str(),
 				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
+			this->progressBar.setEnabled(false);
+			this->installButton.setEnabled(true);
+			this->uninstallButton.setEnabled(true);
+		}
+
+		try
+		{
+			if (uninstallButton.isPressed())
+				this->_downloadUninstall();
+			if (this->state == State::DownloadUninstall)
+				this->_updateDownloadUninstallProgress();
+			if (this->state == State::DoneDownloadUninstall)
+				this->_applyUninstaller();
+			if (this->state == State::ApplyUninstall)
+				this->_updateUninstallProgress();
+			if (this->state == State::DoneUninstall)
+				this->_uninstallFiles();
+		}
+		catch (std::exception& e)
+		{
+			this->state = State::Idle;
+			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
+						 "\n\nLe jeu n'a pas pu etre desinstalle car les fichiers ne correspondent pas, pour "
+						 "desinstaller le patch, reparez les fichiers sur steam.\nSi vous avez besoin "
+						 "d'aide, rendez-vous sur notre discord.")
+							.c_str(),
+						(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
 			this->progressBar.setEnabled(false);
 			this->installButton.setEnabled(true);
 			this->uninstallButton.setEnabled(true);
@@ -282,5 +221,39 @@ namespace drfr
 		in >> version;
 
 		return version == latest;
+	}
+
+	void UpdaterWindow::_scaleElements()
+	{
+		auto viewSize = window.getView().getSize();
+
+		float bgScale = viewSize.y / static_cast<float>(backgroundImg.getSize().y);
+		background.setScale(sf::Vector2f(bgScale, bgScale));
+		background.setPosition(sf::Vector2f(viewSize.x / 2, viewSize.y / 2));
+		background.setOrigin(
+			sf::Vector2f(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2));
+
+		float logoScale = (viewSize.x * (2 / 3.0f)) / static_cast<float>(logoImg.getSize().x);
+		logo.setScale(sf::Vector2f(logoScale, logoScale));
+		logo.setPosition(sf::Vector2f(viewSize.x / 2, viewSize.y * 0.15));
+		logo.setOrigin(sf::Vector2f(logo.getLocalBounds().width / 2, logo.getLocalBounds().height / 2));
+
+		sf::Vector2f installPos(viewSize.x / 2 - viewSize.x * 0.25, viewSize.y * 0.45);
+		sf::Vector2f installSize(viewSize.x * 0.5, viewSize.y * 0.13);
+		sf::Vector2f uninstallPos(viewSize.x / 2 - viewSize.x * 0.115, viewSize.y * 0.795);
+		sf::Vector2f uninstallSize(viewSize.x * 0.23, viewSize.y * 0.07);
+		sf::Vector2f creditsPos(viewSize.x / 2 - viewSize.x * 0.15, viewSize.y * 0.91);
+		sf::Vector2f creditsSize(viewSize.x * 0.3, viewSize.y * 0.07);
+
+		float prevResX = static_cast<float>(previousResolution.x);
+		installButton.setRect(installPos, installSize);
+		installButton.setFontSize(installButton.getFontSize() * (viewSize.x / prevResX));
+		uninstallButton.setRect(uninstallPos, uninstallSize);
+		uninstallButton.setFontSize(uninstallButton.getFontSize() * (viewSize.x / prevResX));
+		creditsButton.setRect(creditsPos, creditsSize);
+		creditsButton.setFontSize(creditsButton.getFontSize() * (viewSize.x / prevResX));
+
+		progressBar.setPosition(sf::Vector2f(viewSize.x / 2 - viewSize.x * 0.225, viewSize.y * 0.595));
+		progressBar.setSize(sf::Vector2f(viewSize.x * 0.45, viewSize.y * 0.02));
 	}
 }
