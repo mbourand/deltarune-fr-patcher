@@ -93,7 +93,7 @@ namespace drfr
 		}
 	}
 
-	void applyPatch(std::string sourcePath, std::string patchPath, std::string targetPath, float& progress)
+	static void _applyPatch(std::string sourcePath, std::string patchPath, std::string targetPath, float& progress)
 	{
 		static constexpr std::array<void (*)(std::ifstream&, std::fstream&, std::ifstream&, uint64_t, int&, int&, int&),
 									4>
@@ -156,6 +156,20 @@ namespace drfr
 			throw std::runtime_error("Failed to write target file");
 
 		progress = 1;
+	}
+
+	void applyPatch(std::string sourcePath, std::string patchPath, std::string targetPath, float& progress,
+					std::string& errorMessage)
+	{
+		try
+		{
+			_applyPatch(sourcePath, patchPath, targetPath, progress);
+		}
+		catch (std::exception& e)
+		{
+			progress = -1;
+			errorMessage = e.what();
+		}
 	}
 
 }

@@ -7,3 +7,6 @@
 [submodule "external/SFML"]
 	path = external/SFML
 	url = https://github.com/SFML/SFML
+[submodule "external/BOXER"]
+	path = external/BOXER
+	url = https://github.com/aaronmjacobs/Boxer

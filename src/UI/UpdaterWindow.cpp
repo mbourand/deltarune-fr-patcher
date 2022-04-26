@@ -1,6 +1,7 @@
 #include "UI/UpdaterWindow.hpp"
 #include "BPSParser.hpp"
 #include "utils.hpp"
+#include <boxer/boxer.h>
 #include <nfd.h>
 
 namespace drfr
@@ -189,19 +190,35 @@ namespace drfr
 											 window.getView().getSize().y * 0.595));
 		progressBar.setSize(sf::Vector2f(window.getView().getSize().x * 0.45, window.getView().getSize().y * 0.02));
 
-		if (installButton.isPressed() && !isUpToDate())
-			this->_download();
-		if (creditsButton.isPressed())
-			utils::openWebPage("https://deltarune.fr/credits");
+		try
+		{
+			if (installButton.isPressed() && !isUpToDate())
+				this->_download();
+			if (creditsButton.isPressed())
+				utils::openWebPage("https://deltarune.fr/credits");
 
-		if (this->state == State::Downloading)
-			this->_updateDownloadProgress();
-		if (this->state == State::DoneDownloading)
-			this->_applyPatch();
-		if (this->state == State::Installing)
-			this->_updateInstallProgressBar();
-		if (this->state == State::DoneInstalling)
-			this->_moveFiles();
+			if (this->state == State::Downloading)
+				this->_updateDownloadProgress();
+			if (this->state == State::DoneDownloading)
+				this->_applyPatch();
+			if (this->state == State::Installing)
+				this->_updateInstallProgressBar();
+			if (this->state == State::DoneInstalling)
+				this->_moveFiles();
+		}
+		catch (std::exception& e)
+		{
+			this->state = State::Idle;
+			boxer::show(
+				(std::string("Une erreur est survenue: ") + e.what() +
+				 "\n\nVerifiez que le jeu est a jour, reparez les fichiers, puis reessayez.\nSi vous avez besoin "
+				 "d'aide, rendez-vous sur notre discord.")
+					.c_str(),
+				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
+			this->progressBar.setEnabled(false);
+			this->installButton.setEnabled(true);
+			this->uninstallButton.setEnabled(true);
+		}
 	}
 
 	void UpdaterWindow::render()

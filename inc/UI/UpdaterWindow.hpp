@@ -38,6 +38,7 @@ namespace drfr
 		uint64_t downloadTime;
 		std::string dataWinPathStr;
 		float installProgress;
+		std::string errorMessage;
 
 		void init();
 

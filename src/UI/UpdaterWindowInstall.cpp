@@ -65,31 +65,28 @@ namespace drfr
 		toDownloadStr.erase(toDownloadStr.find('.') + 3, std::string::npos);
 		progressBar.setDesc(std::wstring(L"Téléchargé : ") + downloadedStr + L" / " + toDownloadStr + L"Mo");
 
-		std::cout << downloaded << " / " << totalDownloadSize << std::endl;
 		if (downloaded >= this->totalDownloadSize)
 			this->state = State::DoneDownloading;
 	}
 
 	void UpdaterWindow::_applyPatch()
 	{
+		this->installProgress = 0;
 		auto temp = std::filesystem::temp_directory_path();
 		for (auto& file : this->filesToDownload)
 		{
 			if (std::filesystem::path(file).extension() == ".bps")
 			{
-				std::string targetPath =
+				std::thread t(
+					drfr::applyPatch, this->dataWinPathStr, (temp / std::to_string(this->downloadTime) / file).string(),
 					(temp / std::to_string(this->downloadTime) / std::filesystem::path(this->dataWinPathStr).filename())
-						.string();
-				std::thread t(drfr::applyPatch, this->dataWinPathStr,
-							  (temp / std::to_string(this->downloadTime) / file).string(), targetPath,
-							  std::ref(this->installProgress));
+						.string(),
+					std::ref(this->installProgress), std::ref(this->errorMessage));
 				t.detach();
 				file = "data.win";
 				break;
 			}
 		}
-
-		this->installProgress = 0;
 
 		this->progressBar.setProgression(0);
 		this->progressBar.setMax(1);
@@ -100,6 +97,11 @@ namespace drfr
 
 	void UpdaterWindow::_updateInstallProgressBar()
 	{
+		if (this->installProgress < 0)
+		{
+			throw std::runtime_error(this->errorMessage);
+			return;
+		}
 		progressBar.setProgression(this->installProgress);
 
 		std::wstring rounded = std::to_wstring(round(this->installProgress * 10000.0f) / 100.0f);

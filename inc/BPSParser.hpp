@@ -22,5 +22,5 @@ namespace drfr
 		uint64_t length;
 	};
 
-	void applyPatch(std::string file, std::string patch, std::string targetPath, float& progress);
+	void applyPatch(std::string file, std::string patch, std::string targetPath, float& progress, std::string& error);
 }
