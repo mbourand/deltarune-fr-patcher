@@ -1,7 +1,7 @@
 # Deltarune FR Patcher
 Ce programme est un installateur pour le Patch Français de Deltarune.
 
-<p align="center"><img src="" width="400px"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/mbourand/deltarune-fr-patcher/master/.illustration/screenshot.png" width="400px"></p>
 
 ## Installation
 ```
