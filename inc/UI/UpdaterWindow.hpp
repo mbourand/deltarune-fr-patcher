@@ -27,7 +27,7 @@ namespace drfr
 		sf::Event event;
 		sf::Texture backgroundImg, logoImg;
 		sf::Sprite background, logo;
-		Button installButton, uninstallButton, creditsButton;
+		Button installButton, uninstallButton, creditsButton, tutorialButton;
 		ProgressBar progressBar;
 		sf::Vector2f previousResolution;
 		bool handCursor;
@@ -35,6 +35,7 @@ namespace drfr
 		sf::Font font;
 		sf::Image icon;
 		std::string latestVersion;
+		sf::Text tutorialText;
 
 		State state;
 		uint64_t totalDownloadSize;
@@ -63,10 +64,6 @@ namespace drfr
 		void _applyPatch();
 		void _updateInstallProgressBar();
 		void _moveFiles();
-		void _downloadUninstall();
-		void _updateDownloadUninstallProgress();
-		void _applyUninstaller();
-		void _updateUninstallProgress();
 		void _uninstallFiles();
 		void _downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time);
 	};

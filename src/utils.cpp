@@ -96,7 +96,7 @@ namespace utils
 #elif defined(OS_MACOS)
 		return "mac";
 #endif
-		throw std::runtime_error("Unknown OS");
+		throw std::runtime_error("OS non supporté");
 	}
 
 	std::string openFileDialog(const std::string& title, const std::vector<nfdfilteritem_t>& filters)

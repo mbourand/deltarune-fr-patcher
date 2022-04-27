@@ -119,12 +119,16 @@ namespace drfr
 	{
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 
-		std::error_code ec; // To avoid throws
-		if (!isInstalled())
-			for (auto& file : this->filesToDownload)
-				std::filesystem::rename(deltaruneFolder / file, deltaruneFolder / (file + ".original"), ec);
+		for (auto& file : this->filesToDownload)
+		{
+			auto toPath = (deltaruneFolder / (file + ".original"));
+			toPath.replace_filename("." + toPath.filename().string());
+			std::filesystem::remove(toPath);
+			std::filesystem::rename(deltaruneFolder / file, toPath);
+		}
 
 		auto temp = std::filesystem::temp_directory_path();
+		std::error_code ec; // To avoid throws
 		for (auto& file : this->filesToDownload)
 		{
 			std::filesystem::remove(deltaruneFolder / file, ec);
@@ -139,7 +143,7 @@ namespace drfr
 		out << version;
 		out.close();
 
-		boxer::show("Le patch a ete applique avec succes !", "Patch applique");
+		boxer::show("Le patch a ete installe avec succes !", "Patch applique");
 
 		installButton.setEnabled(true);
 		uninstallButton.setEnabled(true);
