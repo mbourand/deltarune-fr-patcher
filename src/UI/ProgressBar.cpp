@@ -6,7 +6,8 @@ namespace drfr
 	ProgressBar::ProgressBar(const std::wstring& desc, float current, float max)
 		: desc(desc), current(current), max(max), enabled(true)
 	{
-		this->font.loadFromFile("assets/determination.ttf");
+		if (!this->font.loadFromFile("assets/determination.ttf"))
+			throw std::runtime_error("La police n'a pas pu être chargée");
 	}
 
 	void ProgressBar::setProgression(float current) { this->current = current; }

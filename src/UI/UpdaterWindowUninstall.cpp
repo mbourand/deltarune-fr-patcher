@@ -7,8 +7,7 @@ namespace drfr
 {
 	void UpdaterWindow::_uninstallFiles()
 	{
-		this->dataWinPathStr =
-			utils::openFileDialog("Sélectionnez le data.win de DELTARUNE", {{"DELTARUNE data", "win"}});
+		this->dataWinPathStr = utils::openFileDialog({{"DELTARUNE data", "win"}});
 		if (dataWinPathStr.empty())
 			return;
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();

@@ -44,7 +44,7 @@ namespace drfr
 		if (!this->font.loadFromFile("assets/determination.ttf"))
 			throw std::runtime_error("La police n'a pas pu être chargée");
 
-		utils::getToString("https://deltaruneapi.mbourand.fr/updater/version.txt", this->latestVersion);
+		utils::getToString("https://deltarune.fr/installer/version.txt", this->latestVersion);
 
 		if (!backgroundImg.loadFromFile("assets/bg.png"))
 			throw std::runtime_error("L'arrière-plan n'a pas pu être chargé");
@@ -54,39 +54,26 @@ namespace drfr
 			throw std::runtime_error("Le logo n'a pas pu être chargé");
 		logo = sf::Sprite(logoImg);
 
-		sf::Vector2f installPos(window.getSize().x / 2 - window.getSize().x * 0.25, window.getSize().y * 0.45);
-		sf::Vector2f installSize(window.getSize().x * 0.5, window.getSize().y * 0.13);
-		installButton = Button(installPos, installSize, L"Installer", 50);
-
-		sf::Vector2f uninstallPos(window.getSize().x / 2 - window.getSize().x * 0.115, window.getSize().y * 0.795);
-		sf::Vector2f uninstallSize(window.getSize().x * 0.23, window.getSize().y * 0.07);
-		uninstallButton = Button(uninstallPos, uninstallSize, L"Désinstaller", 30);
-
-		sf::Vector2f creditsPos(window.getSize().x / 2 - window.getSize().x * 0.15, window.getSize().y * 0.91);
-		sf::Vector2f creditsSize(window.getSize().x * 0.3, window.getSize().y * 0.07);
-		creditsButton = Button(creditsPos, creditsSize, L"Crédits", 38);
-
-		sf::Vector2f tutorialSize(window.getSize().x * 0.175, window.getSize().y * 0.06);
-		sf::Vector2f tutorialPos(window.getSize().x - tutorialSize.x - window.getSize().x * 0.02,
-								 window.getSize().y * 0.92);
-		tutorialButton = Button(tutorialPos, tutorialSize, L"Aide", 30);
-
-		sf::Vector2f progressPos(window.getSize().x / 2 - window.getSize().x * 0.225, window.getSize().y * 0.595);
-		sf::Vector2f progressSize(window.getSize().x * 0.45, window.getSize().y * 0.02);
+		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Installer", 50);
+		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Désinstaller", 30);
+		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Crédits", 38);
+		tutorialButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Aide", 26);
 		progressBar = ProgressBar(L"", 0, 100);
-		progressBar.setPosition(progressPos);
-		progressBar.setSize(progressSize);
 		progressBar.setEnabled(false);
 
-		std::string text = "Si vous voulez installer le patch, vérifiez que votre jeu\nest à jour et en anglais.\n\n1. "
-						   "Cliquez sur installer/désinstaller.\n2. Choisissez le fichier \"data.win\" dans votre "
-						   "dossier deltarune.\n3. Attendez la fin des barres de progression.\n\nSi vous rencontrez "
-						   "des difficultés, référez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
+		std::string text =
+			std::string("Si vous voulez installer le patch, vérifiez que votre jeu\nest à jour dans sa version "
+						"originale.\n\n1. Cliquez sur installer/désinstaller.\n2. Choisissez le fichier \"") +
+			DATA_WIN_NAME +
+			"\" dans votre dossier deltarune.\n3. Attendez la fin des barres de progression.\n\nSi vous rencontrez "
+			"des difficultés, référez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
 		this->tutorialText = sf::Text(sf::String::fromUtf8(text.begin(), text.end()), font, 17.5);
 		this->tutorialText.setFillColor(sf::Color::White);
 
 		sf::Vector2f textPos(window.getSize().x / 2 - window.getSize().x * 0.3, window.getSize().y * 0.28);
 		this->tutorialText.setPosition(textPos);
+
+		this->focused = true;
 	}
 
 	void UpdaterWindow::handleEvents()
@@ -101,9 +88,16 @@ namespace drfr
 
 				case sf::Event::Resized:
 					window.setSize(sf::Vector2u(std::max(event.size.width, 640u), std::max(event.size.height, 480u)));
-					sf::View view = this->getLetterboxView();
-					window.setView(view);
+					window.setView(this->getLetterboxView());
 					this->_scaleElements();
+					break;
+
+				case sf::Event::LostFocus:
+					this->focused = false;
+					break;
+
+				case sf::Event::GainedFocus:
+					this->focused = true;
 					break;
 			}
 		}
@@ -111,22 +105,25 @@ namespace drfr
 
 	void UpdaterWindow::doTick()
 	{
-		bool mousePreessed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-		installButton.update(window, mousePreessed);
-		uninstallButton.update(window, mousePreessed);
-		creditsButton.update(window, mousePreessed);
-		tutorialButton.update(window, mousePreessed);
+		if (focused)
+		{
+			bool mousePreessed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+			installButton.update(window, mousePreessed);
+			uninstallButton.update(window, mousePreessed);
+			creditsButton.update(window, mousePreessed);
+			tutorialButton.update(window, mousePreessed);
+		}
 
 		this->_scaleElements();
 
-		if (creditsButton.isPressed())
+		if (creditsButton.isPressed() && this->focused)
 			utils::openWebPage("https://deltarune.fr/credits");
-		if (tutorialButton.isPressed())
+		if (tutorialButton.isPressed() && this->focused)
 			utils::openWebPage("https://www.youtube.com/watch?v=0QFxEse19h4");
 
 		try
 		{
-			if (installButton.isPressed())
+			if (installButton.isPressed() && this->focused)
 				this->_download();
 			if (this->state == State::Downloading)
 				this->_updateDownloadProgress();
@@ -153,7 +150,7 @@ namespace drfr
 
 		try
 		{
-			if (uninstallButton.isPressed())
+			if (uninstallButton.isPressed() && this->focused)
 				this->_uninstallFiles();
 		}
 		catch (std::exception& e)
@@ -224,7 +221,7 @@ namespace drfr
 		if (latest.size() == 0)
 		{
 			std::string versionRaw;
-			utils::getToString("https://deltaruneapi.mbourand.fr/updater/version.txt", versionRaw);
+			utils::getToString("https://deltarune.fr/installer/version.txt", versionRaw);
 			latest = versionRaw;
 		}
 
@@ -252,14 +249,14 @@ namespace drfr
 		this->logo.setPosition(sf::Vector2f(viewSize.x / 2, viewSize.y * 0.15));
 		this->logo.setOrigin(sf::Vector2f(logo.getLocalBounds().width / 2, logo.getLocalBounds().height / 2));
 
-		sf::Vector2f installPos(viewSize.x / 2 - viewSize.x * 0.25, viewSize.y * 0.55);
-		sf::Vector2f installSize(viewSize.x * 0.5, viewSize.y * 0.13);
+		sf::Vector2f installPos(viewSize.x * 0.27, viewSize.y * 0.57);
+		sf::Vector2f installSize(viewSize.x * 0.46, viewSize.y * 0.11);
 		sf::Vector2f uninstallPos(viewSize.x / 2 - viewSize.x * 0.115, viewSize.y * 0.795);
 		sf::Vector2f uninstallSize(viewSize.x * 0.23, viewSize.y * 0.07);
 		sf::Vector2f creditsPos(viewSize.x / 2 - viewSize.x * 0.15, viewSize.y * 0.91);
 		sf::Vector2f creditsSize(viewSize.x * 0.3, viewSize.y * 0.07);
-		sf::Vector2f tutorialSize(viewSize.x * 0.175, viewSize.y * 0.06);
-		sf::Vector2f tutorialPos(viewSize.x - tutorialSize.x - viewSize.x * 0.02, viewSize.y * 0.92);
+		sf::Vector2f tutorialSize(viewSize.x * 0.14, viewSize.y * 0.055);
+		sf::Vector2f tutorialPos(viewSize.x - tutorialSize.x - viewSize.x * 0.015, viewSize.y * 0.93);
 
 		float prevResX = static_cast<float>(previousResolution.x);
 		this->installButton.setRect(installPos, installSize);

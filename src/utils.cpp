@@ -99,7 +99,7 @@ namespace utils
 		throw std::runtime_error("OS non supporté");
 	}
 
-	std::string openFileDialog(const std::string& title, const std::vector<nfdfilteritem_t>& filters)
+	std::string openFileDialog(const std::vector<nfdfilteritem_t>& filters)
 	{
 		nfdchar_t* outPath = nullptr;
 		nfdresult_t result = NFD_OpenDialog(&outPath, filters.data(), filters.size(), nullptr);

@@ -12,7 +12,7 @@ namespace drfr
 		this->rect.setSize(size);
 		this->text = sf::String::fromUtf8(text.begin(), text.end());
 		if (!this->font.loadFromFile("assets/determination.ttf"))
-			throw std::runtime_error("Could not load font");
+			throw std::runtime_error("La police n'a pas pu être chargée");
 	}
 
 	bool Button::isHovered() const { return this->hovered && this->enabled; }
@@ -51,7 +51,7 @@ namespace drfr
 			rect.setOutlineColor(sf::Color(0xffff05ff));
 		else
 			rect.setOutlineColor(sf::Color(0xff8903ff));
-		rect.setOutlineThickness(7);
+		rect.setOutlineThickness(5);
 
 		// Avoid vertical alignment issues with characters like p,f,j,etc.
 		sf::String cleanedText = this->text;

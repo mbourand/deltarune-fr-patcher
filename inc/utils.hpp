@@ -11,6 +11,6 @@ namespace utils
 	int getToFile(const std::string& url, const std::string& dest);
 	std::vector<std::string> split(std::string str, const std::string& delimiter);
 	std::string getOS();
-	std::string openFileDialog(const std::string& title, const std::vector<nfdfilteritem_t>& filters);
+	std::string openFileDialog(const std::vector<nfdfilteritem_t>& filters);
 	void openWebPage(const std::string& url);
 }

@@ -17,10 +17,7 @@ namespace drfr
 			DoneDownloading,
 			Installing,
 			DoneInstalling,
-			DownloadUninstall,
-			DoneDownloadUninstall,
-			ApplyUninstall,
-			DoneUninstall
+			Paused
 		};
 
 		sf::RenderWindow window;
@@ -30,7 +27,6 @@ namespace drfr
 		Button installButton, uninstallButton, creditsButton, tutorialButton;
 		ProgressBar progressBar;
 		sf::Vector2f previousResolution;
-		bool handCursor;
 		sf::Clock cursor_update_clock;
 		sf::Font font;
 		sf::Image icon;
@@ -44,6 +40,8 @@ namespace drfr
 		std::string dataWinPathStr;
 		float installProgress;
 		std::string errorMessage;
+
+		bool focused;
 
 		void init();
 

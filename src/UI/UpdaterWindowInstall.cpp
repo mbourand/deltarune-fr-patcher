@@ -18,15 +18,14 @@ namespace drfr
 
 	void UpdaterWindow::_download()
 	{
-		this->dataWinPathStr =
-			utils::openFileDialog("Sélectionnez le data.win de DELTARUNE", {{"DELTARUNE data", "win"}});
+		this->dataWinPathStr = utils::openFileDialog({{"DELTARUNE data", "win"}});
 		if (dataWinPathStr.empty())
 			return;
 
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 		std::string os = utils::getOS();
 		std::string filesRaw;
-		utils::getToString("https://deltaruneapi.mbourand.fr/updater/" + os + "_list.txt", filesRaw);
+		utils::getToString("https://deltarune.fr/installer/" + os + "_list.txt", filesRaw);
 
 		this->filesToDownload = utils::split(filesRaw, "\n");
 		this->totalDownloadSize = atoll(this->filesToDownload.back().c_str());
@@ -34,8 +33,8 @@ namespace drfr
 
 		this->downloadTime = std::time(nullptr);
 		std::thread dlThread([this, os] {
-			this->_downloadFiles(std::string("https://deltaruneapi.mbourand.fr/updater/" + os + "/"),
-								 this->filesToDownload, this->downloadTime);
+			this->_downloadFiles(std::string("https://deltarune.fr/installer/" + os + "/"), this->filesToDownload,
+								 this->downloadTime);
 		});
 		dlThread.detach();
 
@@ -86,7 +85,7 @@ namespace drfr
 						.string(),
 					std::ref(this->installProgress), std::ref(this->errorMessage));
 				t.detach();
-				file = "data.win";
+				file = DATA_WIN_NAME;
 				break;
 			}
 		}
@@ -138,7 +137,7 @@ namespace drfr
 		}
 
 		std::string version;
-		utils::getToString("https://deltaruneapi.mbourand.fr/updater/version.txt", version);
+		utils::getToString("https://deltarune.fr/installer/version.txt", version);
 		std::ofstream out("version.txt");
 		out << version;
 		out.close();
