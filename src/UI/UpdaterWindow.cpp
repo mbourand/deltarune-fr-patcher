@@ -116,13 +116,21 @@ namespace drfr
 
 		this->_scaleElements();
 
-		if (creditsButton.isPressed() && this->focused)
-			utils::openWebPage("https://deltarune.fr/credits");
-		if (tutorialButton.isPressed() && this->focused)
-			utils::openWebPage("https://www.youtube.com/watch?v=0QFxEse19h4");
-
 		try
 		{
+			if (creditsButton.isPressed() && this->focused)
+			{
+				std::string url;
+				utils::getToString("https://deltarune.fr/installer/credits_url.txt", url);
+				utils::openWebPage(url);
+			}
+			if (tutorialButton.isPressed() && this->focused)
+			{
+				std::string url;
+				utils::getToString("https://deltarune.fr/installer/help_url.txt", url);
+				utils::openWebPage(url);
+			}
+
 			if (installButton.isPressed() && this->focused)
 				this->_download();
 			if (this->state == State::Downloading)
