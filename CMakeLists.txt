@@ -8,8 +8,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(external/NFD)
 
-set(BUILD_SHARED_LIBS FALSE)
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory(external/CURL)
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(external/SFML)
 add_subdirectory(external/BOXER)
 
@@ -19,4 +20,4 @@ add_executable(${PROJECT_NAME} src/main.cpp src/BPSParser.cpp src/CRC32.cpp src/
 # Linking
 
 target_include_directories(${PROJECT_NAME} PUBLIC external/NFD/src/include PUBLIC external/CURL/include PUBLIC external/SFML/include PUBLIC external/BOXER/include PUBLIC inc)
-target_link_libraries(${PROJECT_NAME} nfd Boxer ${CURL_LIBRARIES} sfml-system sfml-window sfml-graphics)
+target_link_libraries(${PROJECT_NAME} nfd Boxer ${LIBCURL_OUTPUT_NAME} sfml-system sfml-window sfml-graphics)
