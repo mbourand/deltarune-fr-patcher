@@ -1,16 +1,20 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.2)
 
 project(deltarune-fr-patcher)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(MSVC)
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
+
 # Building Libs
 
 add_subdirectory(external/NFD)
 
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS TRUE)
 add_subdirectory(external/CURL)
-set(BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS FALSE)
 add_subdirectory(external/SFML)
 add_subdirectory(external/BOXER)
 
