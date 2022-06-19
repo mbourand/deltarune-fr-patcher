@@ -38,35 +38,35 @@ namespace drfr
 		previousResolution = window.getView().getSize();
 
 		if (!icon.loadFromFile("assets/icon.png"))
-			throw std::runtime_error("L'icône n'a pas pu être chargé");
+			throw std::runtime_error("L'ic\xF4ne n'a pas pu \xEAtre charg\xE9");
 		window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 		if (!this->font.loadFromFile("assets/determination.ttf"))
-			throw std::runtime_error("La police n'a pas pu être chargée");
+			throw std::runtime_error("La police n'a pas pu \xEAtre charg\xE9e");
 
 		utils::getToString("https://deltarune.fr/installer/version.txt", this->latestVersion);
 
 		if (!backgroundImg.loadFromFile("assets/bg.png"))
-			throw std::runtime_error("L'arrière-plan n'a pas pu être chargé");
+			throw std::runtime_error("L'arri\xE8re-plan n'a pas pu \xEAtre charg\xE9");
 		background = sf::Sprite(backgroundImg);
 
 		if (!logoImg.loadFromFile("assets/logo.png"))
-			throw std::runtime_error("Le logo n'a pas pu être chargé");
+			throw std::runtime_error("Le logo n'a pas pu \xEAtre charg\xE9");
 		logo = sf::Sprite(logoImg);
 
 		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Installer", 50);
-		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Désinstaller", 30);
-		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Crédits", 38);
+		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"D\xE9sinstaller", 30);
+		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Cr\xE9dits", 38);
 		tutorialButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Aide", 26);
 		progressBar = ProgressBar(L"", 0, 100);
 		progressBar.setEnabled(false);
 
 		std::string text =
-			std::string("Si vous voulez installer le patch, vérifiez que votre jeu\nest à jour dans sa version "
-						"originale.\n\n1. Cliquez sur installer/désinstaller.\n2. Choisissez le fichier \"") +
+			std::string("Si vous voulez installer le patch, v\xE9rifiez que votre jeu\nest \xE0 jour dans sa version "
+						"originale.\n\n1. Cliquez sur installer/d\xE9sinstaller.\n2. Choisissez le fichier \"") +
 			DATA_WIN_NAME +
 			"\" dans votre dossier deltarune.\n3. Attendez la fin des barres de progression.\n\nSi vous rencontrez "
-			"des difficultés, référez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
+			"des difficult\xE9s, r\xE9f\xE9rez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
 		this->tutorialText = sf::Text(sf::String::fromUtf8(text.begin(), text.end()), font, 17.5);
 		this->tutorialText.setFillColor(sf::Color::White);
 
@@ -191,8 +191,8 @@ namespace drfr
 
 		std::string currentVersion = getVersion();
 
-		std::string fullText = std::string("Dernière Version : v") + latestVersion +
-							   "\nVersion Installée : " + (currentVersion.size() ? "v" + currentVersion : "Aucune");
+		std::string fullText = std::string("Derni\xE8re Version : v") + latestVersion +
+							   "\nVersion Install\xE9e : " + (currentVersion.size() ? "v" + currentVersion : "Aucune");
 		sf::Text versionText(sf::String::fromUtf8(fullText.begin(), fullText.end()), font, 17);
 
 		versionText.setPosition(sf::Vector2f(10, window.getView().getSize().y - 45));
