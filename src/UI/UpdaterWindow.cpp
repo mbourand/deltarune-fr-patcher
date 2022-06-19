@@ -147,7 +147,7 @@ namespace drfr
 			this->state = State::Idle;
 			boxer::show(
 				(std::string("Une erreur est survenue: ") + e.what() +
-				 "\n\nVerifiez que le jeu est a jour, reparez les fichiers, puis reessayez.\nSi vous avez besoin "
+				 "\n\nV\xE9rifiez que le jeu est \xE0 jour, r\xE9parez les fichiers, puis r\xE9essayez.\nSi vous avez besoin "
 				 "d'aide, rendez-vous sur notre discord.")
 					.c_str(),
 				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
@@ -165,8 +165,8 @@ namespace drfr
 		{
 			this->state = State::Idle;
 			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
-						 "\n\nLe patch n'a pas pu etre desinstalle. Pour "
-						 "desinstaller le patch, mettez votre jeu a jour.\nSi vous avez besoin "
+						 "\n\nLe patch n'a pas pu \xEAtre d\xE9sinstall\xE9. Pour "
+						 "d\xE9sinstaller le patch, mettez votre jeu \xE0 jour.\nSi vous avez besoin "
 						 "d'aide, rendez-vous sur notre discord.")
 							.c_str(),
 						(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
