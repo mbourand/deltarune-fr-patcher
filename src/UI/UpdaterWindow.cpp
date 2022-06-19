@@ -38,7 +38,7 @@ namespace drfr
 		previousResolution = window.getView().getSize();
 
 		if (!icon.loadFromFile("assets/icon.png"))
-			throw std::runtime_error("L'icône n'a pas pu être chargé");
+			throw std::runtime_error("L'icône n'a pas pu être chargée");
 		window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 		if (!this->font.loadFromFile("assets/determination.ttf"))
