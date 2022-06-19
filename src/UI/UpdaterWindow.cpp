@@ -145,12 +145,12 @@ namespace drfr
 		catch (std::exception& e)
 		{
 			this->state = State::Idle;
-			boxer::show(
-				(std::string("Une erreur est survenue: ") + e.what() +
-				 "\n\nV\xE9rifiez que le jeu est à jour, r\xE9parez les fichiers, puis r\xE9essayez.\nSi vous avez besoin "
-				 "d'aide, rendez-vous sur notre discord.")
-					.c_str(),
-				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
+			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
+						 "\n\nV\u00E9rifiez que le jeu est à jour, r\u00E9parez les fichiers, puis r\u00E9essayez.\nSi vous "
+						 "avez besoin "
+						 "d'aide, rendez-vous sur notre discord.")
+							.c_str(),
+						(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
 			this->progressBar.setEnabled(false);
 			this->installButton.setEnabled(true);
 			this->uninstallButton.setEnabled(true);
@@ -191,8 +191,8 @@ namespace drfr
 
 		std::string currentVersion = getVersion();
 
-		std::string fullText = std::string("Derni\xE8re Version : v") + latestVersion +
-							   "\nVersion Install\xE9e : " + (currentVersion.size() ? "v" + currentVersion : "Aucune");
+		std::string fullText = std::string("Dernière Version : v") + latestVersion +
+							   "\nVersion Installée : " + (currentVersion.size() ? "v" + currentVersion : "Aucune");
 		sf::Text versionText(sf::String::fromUtf8(fullText.begin(), fullText.end()), font, 17);
 
 		versionText.setPosition(sf::Vector2f(10, window.getView().getSize().y - 45));
