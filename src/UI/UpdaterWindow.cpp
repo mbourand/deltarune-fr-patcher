@@ -38,20 +38,20 @@ namespace drfr
 		previousResolution = window.getView().getSize();
 
 		if (!icon.loadFromFile("assets/icon.png"))
-			throw std::runtime_error("L'ic\xF4ne n'a pas pu \xEAtre charg\xE9");
+			throw std::runtime_error("L'icône n'a pas pu être chargé");
 		window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 		if (!this->font.loadFromFile("assets/determination.ttf"))
-			throw std::runtime_error("La police n'a pas pu \xEAtre charg\xE9e");
+			throw std::runtime_error("La police n'a pas pu être chargée");
 
 		utils::getToString("https://deltarune.fr/installer/version.txt", this->latestVersion);
 
 		if (!backgroundImg.loadFromFile("assets/bg.png"))
-			throw std::runtime_error("L'arri\xE8re-plan n'a pas pu \xEAtre charg\xE9");
+			throw std::runtime_error("L'arrière-plan n'a pas pu être chargé");
 		background = sf::Sprite(backgroundImg);
 
 		if (!logoImg.loadFromFile("assets/logo.png"))
-			throw std::runtime_error("Le logo n'a pas pu \xEAtre charg\xE9");
+			throw std::runtime_error("Le logo n'a pas pu être chargé");
 		logo = sf::Sprite(logoImg);
 
 		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Installer", 50);
