@@ -55,18 +55,18 @@ namespace drfr
 		logo = sf::Sprite(logoImg);
 
 		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Installer", 50);
-		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"D\xE9sinstaller", 30);
-		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Cr\xE9dits", 38);
+		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Désinstaller", 30);
+		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Crédits", 38);
 		tutorialButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Aide", 26);
 		progressBar = ProgressBar(L"", 0, 100);
 		progressBar.setEnabled(false);
 
 		std::string text =
-			std::string("Si vous voulez installer le patch, v\xE9rifiez que votre jeu\nest \xE0 jour dans sa version "
-						"originale.\n\n1. Cliquez sur installer/d\xE9sinstaller.\n2. Choisissez le fichier \"") +
+			std::string("Si vous voulez installer le patch, vérifiez que votre jeu\nest à jour dans sa version "
+						"originale.\n\n1. Cliquez sur installer/désinstaller.\n2. Choisissez le fichier \"") +
 			DATA_WIN_NAME +
 			"\" dans votre dossier deltarune.\n3. Attendez la fin des barres de progression.\n\nSi vous rencontrez "
-			"des difficult\xE9s, r\xE9f\xE9rez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
+			"des difficultés, référez-vous au pdf d'aide\nou rendez-vous sur notre discord.";
 		this->tutorialText = sf::Text(sf::String::fromUtf8(text.begin(), text.end()), font, 17.5);
 		this->tutorialText.setFillColor(sf::Color::White);
 
@@ -147,7 +147,7 @@ namespace drfr
 			this->state = State::Idle;
 			boxer::show(
 				(std::string("Une erreur est survenue: ") + e.what() +
-				 "\n\nV\xE9rifiez que le jeu est \xE0 jour, r\xE9parez les fichiers, puis r\xE9essayez.\nSi vous avez besoin "
+				 "\n\nV\xE9rifiez que le jeu est à jour, r\xE9parez les fichiers, puis r\xE9essayez.\nSi vous avez besoin "
 				 "d'aide, rendez-vous sur notre discord.")
 					.c_str(),
 				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
