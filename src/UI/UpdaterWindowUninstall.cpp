@@ -33,7 +33,7 @@ namespace drfr
 		std::filesystem::remove("version.txt");
 
 		if (count > 0)
-			boxer::show("Le patch a ete desinstalle avec succes !", "Patch desinstsalle");
+			boxer::show("Le patch \u00E0 \u00E9t\u00E9 d\u00E9sinstall\u00E9 avec succ\u00E8s !", "Patch d\u00E9sinstall\u00E9");
 		else
 			throw std::runtime_error("Fichiers originaux introuvables");
 	}

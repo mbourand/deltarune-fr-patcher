@@ -142,7 +142,7 @@ namespace drfr
 		out << version;
 		out.close();
 
-		boxer::show("Le patch a ete installe avec succes !", "Patch applique");
+		boxer::show("Le patch \u00E0 \u00E9t\u00E9 install\u00E9 avec succ\u00E8s !", "Patch appliqu\u00E9");
 
 		installButton.setEnabled(true);
 		uninstallButton.setEnabled(true);

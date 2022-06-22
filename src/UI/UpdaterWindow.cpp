@@ -38,7 +38,7 @@ namespace drfr
 		previousResolution = window.getView().getSize();
 
 		if (!icon.loadFromFile("assets/icon.png"))
-			throw std::runtime_error("L'icône n'a pas pu être chargé");
+			throw std::runtime_error("L'icône n'a pas pu être chargée");
 		window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 		if (!this->font.loadFromFile("assets/determination.ttf"))
@@ -145,12 +145,12 @@ namespace drfr
 		catch (std::exception& e)
 		{
 			this->state = State::Idle;
-			boxer::show(
-				(std::string("Une erreur est survenue: ") + e.what() +
-				 "\n\nVerifiez que le jeu est a jour, reparez les fichiers, puis reessayez.\nSi vous avez besoin "
-				 "d'aide, rendez-vous sur notre discord.")
-					.c_str(),
-				(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
+			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
+						 "\n\nV\u00E9rifiez que le jeu est à jour, r\u00E9parez les fichiers, puis r\u00E9essayez.\nSi vous "
+						 "avez besoin "
+						 "d'aide, rendez-vous sur notre discord.")
+							.c_str(),
+						(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
 			this->progressBar.setEnabled(false);
 			this->installButton.setEnabled(true);
 			this->uninstallButton.setEnabled(true);
@@ -165,8 +165,8 @@ namespace drfr
 		{
 			this->state = State::Idle;
 			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
-						 "\n\nLe patch n'a pas pu etre desinstalle. Pour "
-						 "desinstaller le patch, mettez votre jeu a jour.\nSi vous avez besoin "
+						 "\n\nLe patch n'a pas pu \u00EAtre d\u00E9sinstall\u00E9. Pour "
+						 "d\u00E9sinstaller le patch, mettez votre jeu \u00E0 jour.\nSi vous avez besoin "
 						 "d'aide, rendez-vous sur notre discord.")
 							.c_str(),
 						(std::string("Une erreur est survenue: ") + e.what()).c_str(), boxer::Style::Error);
