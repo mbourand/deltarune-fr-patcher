@@ -146,7 +146,8 @@ namespace drfr
 		{
 			this->state = State::Idle;
 			boxer::show((std::string("Une erreur est survenue: ") + e.what() +
-						 "\n\nV\u00E9rifiez que le jeu est à jour, r\u00E9parez les fichiers, puis r\u00E9essayez.\nSi vous "
+						 "\n\nV\u00E9rifiez que le jeu est \u00E0 jour, r\u00E9parez les fichiers, puis "
+						 "r\u00E9essayez.\nSi vous "
 						 "avez besoin "
 						 "d'aide, rendez-vous sur notre discord.")
 							.c_str(),
