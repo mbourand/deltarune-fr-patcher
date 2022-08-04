@@ -18,6 +18,10 @@ set(BUILD_SHARED_LIBS FALSE)
 add_subdirectory(external/SFML)
 add_subdirectory(external/BOXER)
 
+if(UNIX)
+	set(CMAKE_CXX_FLAGS "-no-pie")
+endif()
+
 # Sources
 add_executable(${PROJECT_NAME} src/main.cpp src/BPSParser.cpp src/CRC32.cpp src/UI/Button.cpp src/UI/ProgressBar.cpp src/UI/UpdaterWindow.cpp src/utils.cpp src/UI/UpdaterWindowInstall.cpp src/UI/UpdaterWindowUninstall.cpp)
 
