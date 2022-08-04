@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 // Doc https://github.com/blakesmith/rombp/blob/master/docs/bps_spec.md
 
