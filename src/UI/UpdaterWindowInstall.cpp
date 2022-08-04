@@ -61,11 +61,11 @@ namespace drfr
 		}
 
 		progressBar.setProgression(downloaded);
-		std::wstring downloadedStr = std::to_wstring((downloaded / 10000) / 100.0);
-		std::wstring toDownloadStr = std::to_wstring((totalDownloadSize / 10000) / 100.0);
+		std::string downloadedStr = std::to_string((downloaded / 10000) / 100.0);
+		std::string toDownloadStr = std::to_string((totalDownloadSize / 10000) / 100.0);
 		downloadedStr.erase(downloadedStr.find('.') + 3, std::string::npos);
 		toDownloadStr.erase(toDownloadStr.find('.') + 3, std::string::npos);
-		progressBar.setDesc(std::wstring(L"Téléchargé : ") + downloadedStr + L" / " + toDownloadStr + L"Mo");
+		progressBar.setDesc(std::string("Téléchargé : ") + downloadedStr + " / " + toDownloadStr + "Mo");
 
 		if (downloaded >= this->totalDownloadSize)
 			this->state = State::DoneDownloading;
@@ -92,7 +92,7 @@ namespace drfr
 
 		this->progressBar.setProgression(0);
 		this->progressBar.setMax(1);
-		this->progressBar.setDesc(L"Prépatation de l'installation...");
+		this->progressBar.setDesc("Prépatation de l'installation...");
 
 		this->state = State::Installing;
 	}
@@ -106,9 +106,9 @@ namespace drfr
 		}
 		progressBar.setProgression(this->installProgress);
 
-		std::wstring rounded = std::to_wstring(round(this->installProgress * 10000.0f) / 100.0f);
+		std::string rounded = std::to_string(round(this->installProgress * 10000.0f) / 100.0f);
 		rounded.erase(rounded.find('.') + 3, std::string::npos);
-		progressBar.setDesc(std::wstring(L"Installation : ") + rounded + L"%");
+		progressBar.setDesc(std::string("Installation : ") + rounded + "%");
 
 		if (this->installProgress >= 1)
 			this->state = State::DoneInstalling;

@@ -28,9 +28,7 @@ constexpr uint32_t MAX_PARALLEL_DOWNLOADS = 10;
 #endif
 
 #if defined(OS_WINDOWS) || defined(OS_LINUX)
-constexpr wchar_t DATA_WIN_NAME_W[9] = L"data.win";
 constexpr char DATA_WIN_NAME[9] = "data.win";
 #elif defined(OS_MACOS)
-constexpr wchar_t DATA_WIN_NAME_W[9] = L"game.win";
 constexpr char DATA_WIN_NAME[9] = "game.win";
 #endif

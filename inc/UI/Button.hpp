@@ -18,14 +18,14 @@ namespace drfr
 
 	public:
 		Button() = default;
-		Button(const sf::Vector2f& pos, const sf::Vector2f& size, const std::wstring& text, unsigned int fontSize);
+		Button(const sf::Vector2f& pos, const sf::Vector2f& size, const std::string& text, unsigned int fontSize);
 
 		bool isHovered() const;
 		bool isPressed() const;
 
 		void setRect(const sf::Vector2f& pos, const sf::Vector2f& size);
 		void setFontSize(unsigned int fontSize);
-		void setText(const std::wstring& text);
+		void setText(const std::string& text);
 		unsigned int getFontSize() const;
 
 		void update(const sf::RenderWindow& window, bool mousePreessed);

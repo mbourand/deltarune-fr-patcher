@@ -3,7 +3,7 @@
 
 namespace drfr
 {
-	ProgressBar::ProgressBar(const std::wstring& desc, float current, float max)
+	ProgressBar::ProgressBar(const std::string& desc, float current, float max)
 		: desc(desc), current(current), max(max), enabled(true)
 	{
 		if (!this->font.loadFromFile("assets/determination.ttf"))
@@ -12,7 +12,7 @@ namespace drfr
 
 	void ProgressBar::setProgression(float current) { this->current = current; }
 	void ProgressBar::setMax(float max) { this->max = max; }
-	void ProgressBar::setDesc(const std::wstring& desc) { this->desc = desc; }
+	void ProgressBar::setDesc(const std::string& desc) { this->desc = desc; }
 	void ProgressBar::setPosition(const sf::Vector2f& pos) { this->rect.setPosition(pos); }
 	void ProgressBar::setSize(const sf::Vector2f& size) { this->rect.setSize(size); }
 	void ProgressBar::setEnabled(bool enabled) { this->enabled = enabled; }

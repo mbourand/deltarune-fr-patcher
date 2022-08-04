@@ -54,11 +54,11 @@ namespace drfr
 			throw std::runtime_error("Le logo n'a pas pu être chargé");
 		logo = sf::Sprite(logoImg);
 
-		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Installer", 50);
-		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Désinstaller", 30);
-		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Crédits", 38);
-		tutorialButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), L"Aide", 26);
-		progressBar = ProgressBar(L"", 0, 100);
+		installButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Installer", 50);
+		uninstallButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Désinstaller", 30);
+		creditsButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Crédits", 38);
+		tutorialButton = Button(sf::Vector2f(0, 0), sf::Vector2f(0, 0), "Aide", 26);
+		progressBar = ProgressBar("", 0, 100);
 		progressBar.setEnabled(false);
 
 		std::string text =

@@ -8,7 +8,7 @@ namespace drfr
 	class ProgressBar
 	{
 	private:
-		std::wstring desc;
+		std::string desc;
 		float current;
 		float max;
 		sf::RectangleShape rect;
@@ -17,10 +17,10 @@ namespace drfr
 
 	public:
 		ProgressBar() = default;
-		ProgressBar(const std::wstring& desc, float current, float max);
+		ProgressBar(const std::string& desc, float current, float max);
 		void setProgression(float current);
 		void setMax(float max);
-		void setDesc(const std::wstring& desc);
+		void setDesc(const std::string& desc);
 		void setPosition(const sf::Vector2f& pos);
 		void setSize(const sf::Vector2f& size);
 		void setEnabled(bool enabled);
