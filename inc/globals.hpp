@@ -32,3 +32,12 @@ constexpr char DATA_WIN_NAME[9] = "data.win";
 #elif defined(OS_MACOS)
 constexpr char DATA_WIN_NAME[9] = "game.win";
 #endif
+
+#if defined(OS_WINDOWS)
+constexpr char DEFAULT_GAME_PATH[60] = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\DELTARUNEdemo";
+#elif defined(OS_MACOS)
+// constexpr char DEFAULT_GAME_PATH[] = "/Users/<user>/Library/Application
+// Support/Steam/steamapps/common/DELTARUNEdemo";
+#elif defined(OS_LINUX)
+constexpr char DEFAULT_GAME_PATH[] = nullptr;
+#endif

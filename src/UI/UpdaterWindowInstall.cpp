@@ -1,15 +1,17 @@
 #include "BPSParser.hpp"
+#include "CRC32.hpp"
 #include "UI/UpdaterWindow.hpp"
 #include "utils.hpp"
 #include <boxer/boxer.h>
 
 namespace drfr
 {
-	void UpdaterWindow::_downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time)
+	void UpdaterWindow::_downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time,
+									   const std::string& platform)
 	{
 		auto temp = std::filesystem::temp_directory_path();
 		std::filesystem::create_directories(temp / std::to_string(time));
-		for (auto& file : files)
+		for (auto file : files)
 		{
 			auto to = temp / std::to_string(time) / file;
 			utils::getToFile(urlbase + file, to.string());
@@ -22,24 +24,48 @@ namespace drfr
 		if (dataWinPathStr.empty())
 			return;
 
+		/* Determine if the player is on steam or itch based on the crc32 of steam's data.win */
+		std::string crcRaw;
+		utils::getToString("https://deltarune.fr/installer/crc_steam.txt", crcRaw);
+		std::ifstream datawin(this->dataWinPathStr, std::ios::binary);
+		auto crcLocal = crc32(datawin);
+		auto crcSteam = atoll(crcRaw.c_str());
+		std::string platform = (crcLocal == crcSteam ? "steam" : "itch");
+
+		/* Fetch the list of files to download */
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 		std::string os = utils::getOS();
 		std::string filesRaw;
-		utils::getToString("https://deltarune.fr/installer/" + os + "_list.txt", filesRaw);
+		utils::getToString("https://deltarune.fr/installer/" + os + "_list_test.txt", filesRaw);
 
+		/*
+		** - file1.ext
+		** - file2.ext
+		** - ...
+		** - files_size
+		*/
 		this->filesToDownload = utils::split(filesRaw, "\n");
+		std::vector<std::string> filteredFiles;
+		for (unsigned int i = 0; i < filesToDownload.size(); i++)
+		{
+			if (this->filesToDownload[i].find(":") == std::string::npos)
+				filteredFiles.push_back(this->filesToDownload[i]);
+			else if (this->filesToDownload[i].substr(0, this->filesToDownload[i].find(":")) == platform)
+				filteredFiles.push_back(this->filesToDownload[i].substr(this->filesToDownload[i].find(":") + 1));
+		}
+		this->filesToDownload = filteredFiles;
 		this->totalDownloadSize = atoll(this->filesToDownload.back().c_str());
 		this->filesToDownload.pop_back();
 
 		this->downloadTime = std::time(nullptr);
-		std::thread dlThread([this, os] {
+		std::thread dlThread([this, os, platform] {
 			this->_downloadFiles(std::string("https://deltarune.fr/installer/" + os + "/"), this->filesToDownload,
-								 this->downloadTime);
+								 this->downloadTime, platform);
 		});
 		dlThread.detach();
 
-		this->progressBar.setProgression(0);
-		this->progressBar.setMax(totalDownloadSize);
+		this->progressBar.setProgression(0.0f);
+		this->progressBar.setMax(static_cast<float>(totalDownloadSize));
 		this->progressBar.setEnabled(true);
 		this->installButton.setEnabled(false);
 		this->uninstallButton.setEnabled(false);
@@ -60,7 +86,7 @@ namespace drfr
 			downloaded += in.tellg();
 		}
 
-		progressBar.setProgression(downloaded);
+		progressBar.setProgression(static_cast<float>(downloaded));
 		std::string downloadedStr = std::to_string((downloaded / 10000) / 100.0);
 		std::string toDownloadStr = std::to_string((totalDownloadSize / 10000) / 100.0);
 		downloadedStr.erase(downloadedStr.find('.') + 3, std::string::npos);
