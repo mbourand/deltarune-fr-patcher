@@ -32,7 +32,6 @@ namespace drfr
 		sf::Image icon;
 		std::string latestVersion;
 		sf::Text tutorialText;
-		bool itch;
 
 		State state;
 		uint64_t totalDownloadSize;
