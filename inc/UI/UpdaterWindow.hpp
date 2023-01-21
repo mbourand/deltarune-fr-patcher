@@ -63,6 +63,7 @@ namespace drfr
 		void _updateInstallProgressBar();
 		void _moveFiles();
 		void _uninstallFiles();
-		void _downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time);
+		void _downloadFiles(std::string urlbase, const std::vector<std::string>& files, uint64_t time,
+							const std::string& platform);
 	};
 }
