@@ -36,7 +36,7 @@ namespace drfr
 		auto deltaruneFolder = std::filesystem::path(this->dataWinPathStr).parent_path();
 		std::string os = utils::getOS();
 		std::string filesRaw;
-		utils::getToString("https://deltarune.fr/installer/" + os + "_list_test.txt", filesRaw);
+		utils::getToString("https://deltarune.fr/installer/" + os + "_list.txt", filesRaw);
 
 		/*
 		** - file1.ext
